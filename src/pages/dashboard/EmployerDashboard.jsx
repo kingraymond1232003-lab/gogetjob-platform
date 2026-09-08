@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { useAuthStore } from '../../store/authStore'
-import { jobsAPI, depositAPI, submissionsAPI } from '../../services/api'
+import { jobsAPI, submissionsAPI } from '../../services/api'
 import { useCategoryStore } from '../../store/categoryStore'
 
 export default function EmployerDashboard() {
@@ -29,8 +29,7 @@ export default function EmployerDashboard() {
   })
   
   const [loading, setLoading] = useState(false)
-  const [proofReviewJob, setProofReviewJob] = useState(null)
-  const [submissions, setSubmissions] = useState([])
+  const [submissions] = useState([])
 
   useEffect(() => {
     loadJobsAndCredit()

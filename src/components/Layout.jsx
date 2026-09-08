@@ -1,6 +1,4 @@
-import React, { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { useAuthStore } from '../store/authStore'
+import PropTypes from 'prop-types'
 import NavBar from './NavBar'
 
 export default function Layout({ children }) {
@@ -15,7 +13,7 @@ export default function Layout({ children }) {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div>
               <h3 className="font-bold text-white mb-4">Gogetjob</h3>
-              <p className="text-sm">Nigeria's #1 Verified Earning Platform</p>
+              <p className="text-sm">Nigeria’s #1 Verified Earning Platform</p>
             </div>
             <div>
               <h4 className="font-bold text-white mb-4">Platform</h4>
@@ -41,10 +39,14 @@ export default function Layout({ children }) {
             </div>
           </div>
           <div className="border-t border-gray-700 mt-8 pt-8 text-center text-sm">
-            <p>&copy; 2024 Gogetjob. All rights reserved.</p>
+            <p>&copy; 2026 Gogetjob. All rights reserved.</p>
           </div>
         </div>
       </footer>
     </div>
   )
+}
+
+Layout.propTypes = {
+  children: PropTypes.node.isRequired,
 }

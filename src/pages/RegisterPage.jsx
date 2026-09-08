@@ -1,14 +1,15 @@
 import React, { useState } from 'react'
 import { useNavigate, Link, useSearchParams } from 'react-router-dom'
+import { signup } from '@netlify/identity'
 import { useAuthStore } from '../store/authStore'
-import { authAPI } from '../services/api'
+import { getAuthErrorMessage, getDashboardPath } from '../services/auth'
 
 export default function RegisterPage() {
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
-  const { login } = useAuthStore()
+  const setIdentityUser = useAuthStore((state) => state.setIdentityUser)
   
-  const userType = searchParams.get('type') || 'worker'
+  const userType = searchParams.get('type') === 'employer' ? 'employer' : 'worker'
   const [role, setRole] = useState(userType)
   const [formData, setFormData] = useState({
     fullName: '',
@@ -19,6 +20,7 @@ export default function RegisterPage() {
   })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [success, setSuccess] = useState('')
 
   const handleChange = (e) => {
     const { name, value } = e.target
@@ -28,32 +30,48 @@ export default function RegisterPage() {
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError('')
+    setSuccess('')
 
     if (formData.password !== formData.confirmPassword) {
       setError('Passwords do not match')
       return
     }
 
+    if (formData.password.length < 8) {
+      setError('Password must be at least 8 characters long')
+      return
+    }
+
     setLoading(true)
 
     try {
-      const response = await authAPI.register({
-        fullName: formData.fullName,
-        email: formData.email,
-        phoneNumber: formData.phoneNumber,
-        password: formData.password,
-        role,
-      })
-      const { user, token } = response.data
-      login(user, token)
-      
-      if (role === 'worker') {
-        navigate('/dashboard/worker')
-      } else if (role === 'employer') {
-        navigate('/dashboard/employer')
+      const identityUser = await signup(
+        formData.email.trim().toLowerCase(),
+        formData.password,
+        {
+          full_name: formData.fullName.trim(),
+          phone_number: formData.phoneNumber.trim(),
+          role,
+        },
+      )
+
+      if (identityUser.confirmedAt) {
+        const user = setIdentityUser(identityUser)
+        navigate(getDashboardPath(user.role), { replace: true })
+      } else {
+        setSuccess(
+          'Account created. Check your email and select the confirmation link before signing in.',
+        )
+        setFormData({
+          fullName: '',
+          email: '',
+          phoneNumber: '',
+          password: '',
+          confirmPassword: '',
+        })
       }
-    } catch (err) {
-      setError(err.response?.data?.message || 'Registration failed. Please try again.')
+    } catch (error) {
+      setError(getAuthErrorMessage(error, 'Registration'))
     } finally {
       setLoading(false)
     }
@@ -63,11 +81,20 @@ export default function RegisterPage() {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 flex items-center justify-center py-12 px-4">
       <div className="w-full max-w-md bg-white rounded-lg shadow-lg p-8">
         <h1 className="text-3xl font-bold text-center text-gray-800 mb-2">Create Account</h1>
-        <p className="text-center text-gray-600 mb-6">Join Nigeria's #1 Earning Platform</p>
+        <p className="text-center text-gray-600 mb-6">Join Nigeria’s #1 Earning Platform</p>
 
         {error && (
           <div className="mb-4 p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm">
             {error}
+          </div>
+        )}
+
+        {success && (
+          <div className="mb-4 rounded-lg border border-green-200 bg-green-50 p-4 text-sm text-green-800">
+            {success}{' '}
+            <Link to="/login" className="font-semibold underline">
+              Go to login
+            </Link>
           </div>
         )}
 
@@ -115,6 +142,7 @@ export default function RegisterPage() {
             <input
               type="email"
               name="email"
+              autoComplete="email"
               required
               value={formData.email}
               onChange={handleChange}
@@ -128,6 +156,7 @@ export default function RegisterPage() {
             <input
               type="tel"
               name="phoneNumber"
+              autoComplete="tel"
               required
               value={formData.phoneNumber}
               onChange={handleChange}
@@ -141,6 +170,8 @@ export default function RegisterPage() {
             <input
               type="password"
               name="password"
+              minLength={8}
+              autoComplete="new-password"
               required
               value={formData.password}
               onChange={handleChange}
@@ -154,6 +185,8 @@ export default function RegisterPage() {
             <input
               type="password"
               name="confirmPassword"
+              minLength={8}
+              autoComplete="new-password"
               required
               value={formData.confirmPassword}
               onChange={handleChange}

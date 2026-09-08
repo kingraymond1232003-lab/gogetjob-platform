@@ -1,10 +1,8 @@
 import React, { useState, useEffect } from 'react'
-import { useAuthStore } from '../../store/authStore'
 import { adminAPI, depositAPI } from '../../services/api'
 import { useCategoryStore } from '../../store/categoryStore'
 
 export default function AdminDashboard() {
-  const { user } = useAuthStore()
   const { categories } = useCategoryStore()
   
   const [activeTab, setActiveTab] = useState('overview')
@@ -15,7 +13,7 @@ export default function AdminDashboard() {
     totalEmployerDebt: 0,
   })
   
-  const [categories_, setCategories] = useState(categories)
+  const [categories_] = useState(categories)
   const [depositAccounts, setDepositAccounts] = useState([])
   const [pendingTasks, setPendingTasks] = useState([])
   const [pendingDeposits, setPendingDeposits] = useState([])
@@ -24,7 +22,6 @@ export default function AdminDashboard() {
   
   const [newCategory, setNewCategory] = useState({ name: '', slug: '', description: '' })
   const [newBankAccount, setNewBankAccount] = useState({ bankName: '', accountNumber: '', accountName: '' })
-  const [taskPriceMarkup, setTaskPriceMarkup] = useState({})
   const [creditLimitUpdate, setCreditLimitUpdate] = useState({ employerId: '', newLimit: '' })
   const [loading, setLoading] = useState(false)
 

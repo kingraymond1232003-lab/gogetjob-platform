@@ -1,6 +1,5 @@
 # Dependencies
 node_modules/
-package-lock.json
 yarn.lock
 
 # Environment
@@ -29,3 +28,6 @@ yarn-error.log*
 # Testing
 coverage/
 .nyc_output/
+
+# Local Netlify folder
+.netlify
