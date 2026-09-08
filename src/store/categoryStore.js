@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 
-export const useCategoryStore = create((set) => ({
+export const useCategoryStore = create(() => ({
   categories: [
     { id: 1, name: 'App', slug: 'app', description: 'Mobile app tasks' },
     { id: 2, name: 'Instagram', slug: 'instagram', description: 'Instagram engagement' },

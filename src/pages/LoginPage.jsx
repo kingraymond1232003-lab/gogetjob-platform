@@ -1,11 +1,12 @@
 import React, { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
+import { login as identityLogin } from '@netlify/identity'
 import { useAuthStore } from '../store/authStore'
-import { authAPI } from '../services/api'
+import { getAuthErrorMessage, getDashboardPath } from '../services/auth'
 
 export default function LoginPage() {
   const navigate = useNavigate()
-  const { login } = useAuthStore()
+  const setIdentityUser = useAuthStore((state) => state.setIdentityUser)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
@@ -17,20 +18,11 @@ export default function LoginPage() {
     setError('')
 
     try {
-      const response = await authAPI.login(email, password)
-      const { user, token } = response.data
-      login(user, token)
-      
-      // Redirect based on user role
-      if (user.role === 'worker') {
-        navigate('/dashboard/worker')
-      } else if (user.role === 'employer') {
-        navigate('/dashboard/employer')
-      } else if (user.role === 'admin') {
-        navigate('/admin')
-      }
-    } catch (err) {
-      setError(err.response?.data?.message || 'Login failed. Please check your credentials.')
+      const identityUser = await identityLogin(email.trim().toLowerCase(), password)
+      const user = setIdentityUser(identityUser)
+      navigate(getDashboardPath(user.role), { replace: true })
+    } catch (error) {
+      setError(getAuthErrorMessage(error, 'Login'))
     } finally {
       setLoading(false)
     }
@@ -53,6 +45,7 @@ export default function LoginPage() {
             <label className="block text-gray-700 font-medium mb-2">Email Address</label>
             <input
               type="email"
+              autoComplete="email"
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -65,6 +58,7 @@ export default function LoginPage() {
             <label className="block text-gray-700 font-medium mb-2">Password</label>
             <input
               type="password"
+              autoComplete="current-password"
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -84,7 +78,7 @@ export default function LoginPage() {
 
         <div className="mt-6 text-center">
           <p className="text-gray-600">
-            Don't have an account?{' '}
+            Don’t have an account?{' '}
             <Link to="/register" className="text-blue-600 hover:text-blue-700 font-semibold">
               Sign up here
             </Link>

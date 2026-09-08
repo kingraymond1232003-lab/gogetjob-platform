@@ -15,7 +15,7 @@ export default function LandingPage() {
             Micro Jobs in Nigeria & Promote Your Brand
           </h1>
           <p className="text-lg md:text-xl text-blue-100 mb-8">
-            Nigeria's #1 Verified Earning Platform. Earn Real Money Online in Nigeria with Simple Daily Tasks.
+            Nigeria’s #1 Verified Earning Platform. Earn Real Money Online in Nigeria with Simple Daily Tasks.
           </p>
           <div className="flex flex-col md:flex-row gap-4 justify-center">
             <Link
@@ -142,7 +142,7 @@ export default function LandingPage() {
         <div className="max-w-6xl mx-auto">
           <h2 className="text-3xl font-bold mb-8">Make Money Online in Nigeria</h2>
           <p className="text-gray-600 mb-6 leading-relaxed">
-            Gogetjob is Nigeria's leading platform for micro-tasks and digital engagement. Looking to make money online from your phone or computer? We offer simple, verified earning opportunities including app tasks, social media engagement, surveys, and brand promotion. Join thousands of Nigerians earning real money daily through flexible micro-jobs. Whether you're a student, freelancer, or looking for side hustle jobs in Nigeria, Gogetjob provides instant payouts via bank transfer or airtime. Earn extra income completing tasks from companies across Africa and globally.
+            Gogetjob is Nigeria’s leading platform for micro-tasks and digital engagement. Looking to make money online from your phone or computer? We offer simple, verified earning opportunities including app tasks, social media engagement, surveys, and brand promotion. Join thousands of Nigerians earning real money daily through flexible micro-jobs. Whether you’re a student, freelancer, or looking for side hustle jobs in Nigeria, Gogetjob provides instant payouts via bank transfer or airtime. Earn extra income completing tasks from companies across Africa and globally.
           </p>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="text-gray-700">

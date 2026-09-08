@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { useAuthStore } from '../../store/authStore'
-import { withdrawalAPI, depositAPI, usersAPI } from '../../services/api'
+import { withdrawalAPI, usersAPI } from '../../services/api'
 
 function getWithdrawalStatus() {
   const now = new Date()
@@ -34,10 +34,10 @@ function getWithdrawalStatus() {
 export default function WorkerDashboard() {
   const { user } = useAuthStore()
   const [stats, setStats] = useState({ jobsDone: 0, walletBalance: 0, pendingBalance: 0 })
-  const [withdrawalStatus, setWithdrawalStatus] = useState(getWithdrawalStatus())
+  const [withdrawalStatus] = useState(getWithdrawalStatus())
   const [activeTab, setActiveTab] = useState('overview')
   const [withdrawalForm, setWithdrawalForm] = useState({ type: 'bank', amount: '', details: '' })
-  const [taskHistory, setTaskHistory] = useState([])
+  const [taskHistory] = useState([])
   const [referralData, setReferralData] = useState({ link: '', referrals: 0, bonuses: 0, commissions: 0 })
   const [loading, setLoading] = useState(false)
 

@@ -1,40 +1,58 @@
 import { create } from 'zustand'
+import {
+  getUser,
+  handleAuthCallback,
+  logout as identityLogout,
+  onAuthChange,
+} from '@netlify/identity'
+import { getAuthErrorMessage, normalizeIdentityUser } from '../services/auth'
 
-export const useAuthStore = create((set) => ({
+let initializationPromise = null
+
+export const useAuthStore = create((set, get) => ({
   user: null,
-  token: localStorage.getItem('token') || null,
-  isAuthenticated: !!localStorage.getItem('token'),
+  isAuthenticated: false,
+  isAuthReady: false,
+  authError: '',
 
-  login: (user, token) => {
-    localStorage.setItem('token', token)
-    set({ user, token, isAuthenticated: true })
+  setIdentityUser: (identityUser) => {
+    const user = normalizeIdentityUser(identityUser)
+    set({ user, isAuthenticated: Boolean(user), authError: '' })
+    return user
   },
 
-  logout: () => {
-    localStorage.removeItem('token')
-    set({ user: null, token: null, isAuthenticated: false })
-  },
+  initialize: async () => {
+    if (get().isAuthReady) return get().user
+    if (initializationPromise) return initializationPromise
 
-  setUser: (user) => set({ user }),
-
-  checkAuth: async () => {
-    const token = localStorage.getItem('token')
-    if (token) {
-      // Verify token with backend
+    initializationPromise = (async () => {
       try {
-        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/auth/verify`, {
-          headers: { Authorization: `Bearer ${token}` },
-        })
-        if (response.ok) {
-          const data = await response.json()
-          set({ user: data.user, isAuthenticated: true })
-        } else {
-          localStorage.removeItem('token')
-          set({ user: null, token: null, isAuthenticated: false })
-        }
+        const callback = await handleAuthCallback()
+        const identityUser = callback?.user || (await getUser())
+        return get().setIdentityUser(identityUser)
       } catch (error) {
-        console.error('Auth verification failed:', error)
+        set({ user: null, isAuthenticated: false, authError: getAuthErrorMessage(error) })
+        return null
+      } finally {
+        set({ isAuthReady: true })
+        initializationPromise = null
       }
+    })()
+
+    return initializationPromise
+  },
+
+  subscribeToAuth: () =>
+    onAuthChange((_event, identityUser) => {
+      get().setIdentityUser(identityUser)
+      set({ isAuthReady: true })
+    }),
+
+  logout: async () => {
+    try {
+      await identityLogout()
+    } finally {
+      set({ user: null, isAuthenticated: false, authError: '' })
     }
   },
 }))
